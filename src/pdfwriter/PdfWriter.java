@@ -50,7 +50,7 @@ public class PdfWriter extends Application
     private Button btn_load_pdf, btn_save_pdf, btn_draw_img, btn_draw_text, btn_draw_rect;
     private Text txt_image_x, txt_image_height, txt_image_y, txt_image_width, txt_shape_thick, txt_textimage;
     private TextField txtfield_image_x, txtfield_image_height, txtfield_image_y, txtfield_image_width, txtfield_shape_thick, txtfield_textimage;
-    private int page_index = 0;
+    private int page_index = 1;
     private float zoom_level = 1.0f;
     private String desktop_path;
     private ListView<CheckBox> listview_pages;
@@ -77,7 +77,7 @@ public class PdfWriter extends Application
         txtfield_image_height = Builders.build_textField( "50", 100 );
         txtfield_image_x = Builders.build_textField( "10", 100 );
         txtfield_image_y = Builders.build_textField( "10", 100 );
-        txtfield_shape_thick = Builders.build_textField( "4", 100 );
+        txtfield_shape_thick = Builders.build_textField( "1", 100 );
         txtfield_textimage = Builders.build_textField( "", 150 );
         btn_load_pdf = Builders.build_button( "Load pdf", true );
         btn_save_pdf = Builders.build_button( "Save pdf", false );
@@ -201,8 +201,9 @@ public class PdfWriter extends Application
                         Message_box.show( "ex " + ex.getLocalizedMessage() );
                     }
                     doc_pages = doc.getPages();
-                    slider_page.setMax( doc_pages.getCount() - 1 );
-                    slider_page.setValue( 0 );
+                    slider_page.setMin( 1 );
+                    slider_page.setMax( doc_pages.getCount() );
+                    slider_page.setValue( 1 );
                     slider_page.setDisable( false );
                     btn_save_pdf.setDisable( false );
                     btn_draw_img.setDisable( false );
@@ -210,16 +211,16 @@ public class PdfWriter extends Application
                     btn_draw_rect.setDisable( false );
                     renderer = new PDFRenderer( doc );
                     listview_pages.getItems().clear();
-                    page_index = 0;
-                    int pdf_width = ( int ) doc_pages.get( page_index ).getMediaBox().getWidth();
-                    int pdf_height = ( int ) doc_pages.get( page_index ).getMediaBox().getHeight();
+                    page_index = 1;
+                    int pdf_width = ( int ) doc_pages.get( 0 ).getMediaBox().getWidth();
+                    int pdf_height = ( int ) doc_pages.get( 0 ).getMediaBox().getHeight();
                     txtfield_image_x.setText( pdf_width - 100 + "" );
                     txtfield_image_y.setText( pdf_height - 50 + "" );
                     txtfield_image_width.setText( "100" );
                     txtfield_image_height.setText( "50" );
                     for ( int i = 0; i < doc_pages.getCount(); i++ )
                     {
-                        CheckBox page_checkbox = new CheckBox( "Page " + i );
+                        CheckBox page_checkbox = new CheckBox( "Page " + ( i + 1 ) );
                         page_checkbox.setFont( Constants.def_font );
                         listview_pages.getItems().add( page_checkbox );
                     }
@@ -413,7 +414,7 @@ public class PdfWriter extends Application
     {
         try
         {
-            buffered = renderer.renderImage( page_index, zoom_level );
+            buffered = renderer.renderImage( page_index - 1, zoom_level );
         }
         catch ( IOException ex )
         {
