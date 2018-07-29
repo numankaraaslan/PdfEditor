@@ -215,8 +215,8 @@ public class PdfWriter extends Application
                     int pdf_height = ( int ) doc_pages.get( page_index ).getMediaBox().getHeight();
                     txtfield_image_x.setText( pdf_width - 100 + "" );
                     txtfield_image_y.setText( pdf_height - 50 + "" );
-                    txtfield_image_width = new TextField( "100" );
-                    txtfield_image_height = new TextField( "50" );
+                    txtfield_image_width.setText( "100" );
+                    txtfield_image_height.setText( "50" );
                     for ( int i = 0; i < doc_pages.getCount(); i++ )
                     {
                         CheckBox page_checkbox = new CheckBox( "Page " + i );
