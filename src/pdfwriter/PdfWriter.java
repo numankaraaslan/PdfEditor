@@ -42,33 +42,19 @@ public class PdfWriter extends Application
     private ImageView imgview_pdf;
     private Slider slider_page;
     private PDDocument doc;
-    private PDFRenderer renderer;
-    private final VBox root = new VBox( 10 );
-    private final VBox vbox_list = new VBox( 10 );
-    private final HBox hbox_controls = new HBox( 10 );
-    private final HBox hbox_controls_2 = new HBox( 10 );
-    private final HBox hbox_controls_3 = new HBox( 10 );
-    private final HBox hbox_pdf = new HBox( 10 );
-    private Button btn_load_pdf;
-    private Button btn_save_pdf;
-    private Button btn_draw_img;
-    private Button btn_draw_text;
-    private Button btn_draw_rect;
-    private Font def_font;
     private PDPageTree doc_pages;
+    private PDFRenderer renderer;
     private PDPageContentStream content_stream;
-    private Text txt_image_x, txt_image_height, txt_image_y, txt_image_width;
-    private Text txt_shape_thick;
-    private Text txt_textimage;
-    private TextField txtfield_image_x, txtfield_image_height, txtfield_image_y, txtfield_image_width;
-    private TextField txtfield_shape_thick;
-    private TextField txtfield_textimage;
+    private final VBox root = new VBox( 10 ), vbox_list = new VBox( 10 );
+    private final HBox hbox_controls = new HBox( 10 ), hbox_controls_image = new HBox( 10 ), hbox_controls_text_rectangle = new HBox( 10 ), hbox_pdf = new HBox( 10 );
+    private Button btn_load_pdf, btn_save_pdf, btn_draw_img, btn_draw_text, btn_draw_rect;
+    private Text txt_image_x, txt_image_height, txt_image_y, txt_image_width, txt_shape_thick, txt_textimage;
+    private TextField txtfield_image_x, txtfield_image_height, txtfield_image_y, txtfield_image_width, txtfield_shape_thick, txtfield_textimage;
     private int page_index = 0;
     private float zoom_level = 1.0f;
     private String desktop_path;
     private ListView<CheckBox> listview_pages;
-    private CheckBox checkbox_all;
-    private CheckBox checkbox_fill_rect;
+    private CheckBox checkbox_all, checkbox_fill_rect;
     private Stage primaryStage;
     private ColorPicker color_chooser;
     private ComboBox<Integer> combobox_font_size;
@@ -79,62 +65,35 @@ public class PdfWriter extends Application
     public void start( Stage primaryStage )
     {
         this.primaryStage = primaryStage;
-        def_font = new Font( "Arial", 18 );
-        desktop_path = desktop_path = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "\\";
-        txt_shape_thick = new Text( "Thickness " );
-        txt_shape_thick.setFont( def_font );
-        txtfield_shape_thick = new TextField( "4" );
-        txtfield_shape_thick.setPrefWidth( 100 );
-        txtfield_shape_thick.setFont( def_font );
-        txt_image_x = new Text( "Position X " );
-        txt_image_y = new Text( "Position Y " );
-        txt_image_width = new Text( "Width  " );
-        txt_image_height = new Text( "Height " );
-        txtfield_image_x = new TextField( "10" );
-        txtfield_image_y = new TextField( "10" );
-        txtfield_image_width = new TextField( "100" );
-        txtfield_image_height = new TextField( "50" );
-        txt_image_x.setFont( def_font );
-        txt_image_y.setFont( def_font );
-        txt_image_width.setFont( def_font );
-        txt_image_height.setFont( def_font );
-        txtfield_image_x.setFont( def_font );
-        txtfield_image_y.setFont( def_font );
-        txtfield_image_width.setFont( def_font );
-        txtfield_image_height.setFont( def_font );
-        txtfield_image_x.setPrefWidth( 100 );
-        txtfield_image_y.setPrefWidth( 100 );
-        txtfield_image_width.setPrefWidth( 100 );
-        txtfield_image_height.setPrefWidth( 100 );
-        txt_textimage = new Text( "Text " );
-        txt_textimage.setFont( def_font );
-        txtfield_textimage = new TextField( "" );
-        txtfield_textimage.setPrefWidth( 150 );
-        txtfield_textimage.setFont( def_font );
-        btn_load_pdf = new Button();
-        btn_load_pdf.setFont( def_font );
-        btn_load_pdf.setText( "Load pdf" );
-        btn_save_pdf = new Button();
-        btn_save_pdf.setFont( def_font );
-        btn_save_pdf.setText( "Save pdf" );
-        btn_save_pdf.setDisable( true );
-        btn_draw_img = new Button();
-        btn_draw_img.setFont( def_font );
-        btn_draw_img.setText( "Draw image" );
-        btn_draw_img.setDisable( true );
-        btn_draw_text = new Button();
-        btn_draw_text.setFont( def_font );
-        btn_draw_text.setText( "Draw text" );
-        btn_draw_text.setDisable( true );
-        btn_draw_rect = new Button();
-        btn_draw_rect.setFont( def_font );
-        btn_draw_rect.setText( "Draw rectangle" );
-        btn_draw_rect.setDisable( true );
+        Constants.def_font = new Font( "Arial", 18 );
+        desktop_path = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "\\";
+        txt_shape_thick = Builders.build_text( "Thickness" );
+        txt_image_x = Builders.build_text( "Position X" );
+        txt_image_y = Builders.build_text( "Position Y" );
+        txt_image_width = Builders.build_text( "Width" );
+        txt_image_height = Builders.build_text( "Height" );
+        txt_textimage = Builders.build_text( "Text" );
+        txtfield_image_width = Builders.build_textField( "100", 100 );
+        txtfield_image_height = Builders.build_textField( "50", 100 );
+        txtfield_image_x = Builders.build_textField( "10", 100 );
+        txtfield_image_y = Builders.build_textField( "10", 100 );
+        txtfield_shape_thick = Builders.build_textField( "4", 100 );
+        txtfield_textimage = Builders.build_textField( "", 150 );
+        btn_load_pdf = Builders.build_button( "Load pdf", true );
+        btn_save_pdf = Builders.build_button( "Save pdf", false );
+        btn_draw_img = Builders.build_button( "Draw image", false );
+        btn_draw_text = Builders.build_button( "Draw text", false );
+        btn_draw_rect = Builders.build_button( "Draw rectangle", false );
+        btn_load_pdf.setOnAction( get_btn_load_action() );
+        btn_draw_rect.setOnAction( get_btn_draw_rect_action() );
+        btn_draw_img.setOnAction( get_btn_draw_image_action() );
+        btn_draw_text.setOnAction( get_btn_draw_text_action() );
+        btn_save_pdf.setOnAction( get_btn_save_pdf_action() );
         imgview_pdf = new ImageView();
         imgview_pdf.setPreserveRatio( true );
         slider_page = new Slider( 0, 1, 0 );
         slider_page.setSnapToTicks( true );
-        slider_page.setStyle( "-fx-font-size : 16pt" );
+        slider_page.setStyle( Constants.style );
         slider_page.setBlockIncrement( 1 );
         slider_page.setMinorTickCount( 0 );
         slider_page.setShowTickMarks( true );
@@ -151,30 +110,10 @@ public class PdfWriter extends Application
                 refresh_image();
             }
         } );
-        btn_load_pdf.setOnAction( get_btn_load_action() );
-        btn_draw_rect.setOnAction( get_btn_draw_rect_action() );
-        btn_draw_img.setOnAction( get_btn_draw_image_action() );
-        btn_draw_text.setOnAction( get_btn_draw_text_action() );
-        btn_save_pdf.setOnAction( new EventHandler<ActionEvent>()
-        {
-            @Override
-            public void handle( ActionEvent event )
-            {
-                try
-                {
-                    doc.save( desktop_path + "out.pdf" );
-                    Message_box.show( "PDF file is exported to your desktop", "Success", Message_box.info_message );
-                }
-                catch ( IOException ex )
-                {
-                    Message_box.show( "ex " + ex.getLocalizedMessage() );
-                }
-            }
-        } );
         checkbox_fill_rect = new CheckBox( "Fill" );
-        checkbox_fill_rect.setFont( def_font );
+        checkbox_fill_rect.setFont( Constants.def_font );
         checkbox_all = new CheckBox( "Select all" );
-        checkbox_all.setFont( def_font );
+        checkbox_all.setFont( Constants.def_font );
         checkbox_all.selectedProperty().addListener( new ChangeListener<Boolean>()
         {
             @Override
@@ -190,10 +129,10 @@ public class PdfWriter extends Application
         color_chooser.setValue( Color.BLUE );
         combobox_font_size = new ComboBox<>( FXCollections.observableArrayList( 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72 ) );
         combobox_font_size.getSelectionModel().select( 3 );
-        combobox_font_size.setStyle( "-fx-font-size : 16pt" );
-        combobox_zoom = new ComboBox<>( FXCollections.observableArrayList( 50F, 100F, 150F, 200F, 250F, 300F, 350F, 400F, 450F, 500F, 550F, 600F, 650F, 700F ) );
+        combobox_font_size.setStyle( Constants.style );
+        combobox_zoom = new ComboBox<>( FXCollections.observableArrayList( 50F, 100F, 150F, 200F, 250F, 300F, 350F, 400F, 450F, 500F, 550F, 600F, 650F, 700F, 750F, 800F, 850F, 900F, 950F, 1000F ) );
         combobox_zoom.getSelectionModel().select( 1 );
-        combobox_zoom.setStyle( "-fx-font-size : 16pt" );
+        combobox_zoom.setStyle( Constants.style );
         combobox_zoom.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<Float>()
         {
             @Override
@@ -204,50 +143,26 @@ public class PdfWriter extends Application
             }
         } );
         ScrollPane scroll_pdf = new ScrollPane( imgview_pdf );
-        scroll_pdf.prefWidthProperty().bind( primaryStage.widthProperty().subtract( 210 ) );
-        scroll_pdf.prefHeightProperty().bind( primaryStage.heightProperty().subtract( 250 ) );
+        scroll_pdf.prefWidthProperty().bind( this.primaryStage.widthProperty().subtract( 210 ) );
+        scroll_pdf.prefHeightProperty().bind( this.primaryStage.heightProperty().subtract( 250 ) );
         scroll_pdf.setCenterShape( true );
         listview_pages = new ListView<>();
         listview_pages.setPrefWidth( 200 );
         listview_pages.prefHeightProperty().bind( scroll_pdf.prefHeightProperty() );
-        hbox_controls.getChildren().add( btn_load_pdf );
-        hbox_controls.getChildren().add( slider_page );
-        hbox_controls.getChildren().add( combobox_zoom );
-        hbox_controls.getChildren().add( btn_save_pdf );
+        hbox_controls.getChildren().addAll( btn_load_pdf, slider_page, combobox_zoom, btn_save_pdf );
         hbox_controls.setAlignment( Pos.CENTER_LEFT );
-        hbox_controls_2.getChildren().add( txt_image_x );
-        hbox_controls_2.getChildren().add( txtfield_image_x );
-        hbox_controls_2.getChildren().add( txt_image_y );
-        hbox_controls_2.getChildren().add( txtfield_image_y );
-        hbox_controls_2.getChildren().add( txt_image_width );
-        hbox_controls_2.getChildren().add( txtfield_image_width );
-        hbox_controls_2.getChildren().add( txt_image_height );
-        hbox_controls_2.getChildren().add( txtfield_image_height );
-        hbox_controls_2.getChildren().add( btn_draw_img );
-        hbox_controls_2.setAlignment( Pos.CENTER_LEFT );
-        hbox_controls_3.getChildren().add( txt_textimage );
-        hbox_controls_3.getChildren().add( txtfield_textimage );
-        hbox_controls_3.getChildren().add( color_chooser );
-        hbox_controls_3.getChildren().add( combobox_font_size );
-        hbox_controls_3.getChildren().add( btn_draw_text );
-        hbox_controls_3.getChildren().add( txt_shape_thick );
-        hbox_controls_3.getChildren().add( txtfield_shape_thick );
-        hbox_controls_3.getChildren().add( checkbox_fill_rect );
-        hbox_controls_3.getChildren().add( btn_draw_rect );
-        hbox_controls_3.setAlignment( Pos.CENTER_LEFT );
-        vbox_list.getChildren().add( checkbox_all );
-        vbox_list.getChildren().add( listview_pages );
-        hbox_pdf.getChildren().add( vbox_list );
-        hbox_pdf.getChildren().add( scroll_pdf );
+        hbox_controls_image.getChildren().addAll( txt_image_x, txtfield_image_x, txt_image_y, txtfield_image_y, txt_image_width, txtfield_image_width, txt_image_height, txtfield_image_height, btn_draw_img );
+        hbox_controls_image.setAlignment( Pos.CENTER_LEFT );
+        hbox_controls_text_rectangle.getChildren().addAll( txt_textimage, txtfield_textimage, color_chooser, combobox_font_size, btn_draw_text, txt_shape_thick, txtfield_shape_thick, checkbox_fill_rect, btn_draw_rect );
+        hbox_controls_text_rectangle.setAlignment( Pos.CENTER_LEFT );
+        vbox_list.getChildren().addAll( checkbox_all, listview_pages );
+        hbox_pdf.getChildren().addAll( vbox_list, scroll_pdf );
         root.setPadding( new Insets( 10 ) );
-        root.getChildren().add( hbox_controls );
-        root.getChildren().add( hbox_controls_2 );
-        root.getChildren().add( hbox_controls_3 );
-        root.getChildren().add( hbox_pdf );
+        root.getChildren().addAll( hbox_controls, hbox_controls_image, hbox_controls_text_rectangle, hbox_pdf );
         Scene scene = new Scene( root, 1280, 768 );
-        primaryStage.setTitle( "Hello World of PDF Editing" );
-        primaryStage.setScene( scene );
-        primaryStage.show();
+        this.primaryStage.setTitle( "Hello World of PDF Editing" );
+        this.primaryStage.setScene( scene );
+        this.primaryStage.show();
     }
 
     public static void main( String[] args )
@@ -305,7 +220,7 @@ public class PdfWriter extends Application
                     for ( int i = 0; i < doc_pages.getCount(); i++ )
                     {
                         CheckBox page_checkbox = new CheckBox( "Page " + i );
-                        page_checkbox.setFont( def_font );
+                        page_checkbox.setFont( Constants.def_font );
                         listview_pages.getItems().add( page_checkbox );
                     }
                     checkbox_all.setSelected( false );
@@ -322,6 +237,12 @@ public class PdfWriter extends Application
             @Override
             public void handle( ActionEvent event )
             {
+                if ( !check_selected_pages() )
+                {
+                    Message_box.show( "Select at least 1 page on the left", "Warning", Message_box.warning_message );
+                    listview_pages.requestFocus();
+                    return;
+                }
                 FileChooser file_chooser = new FileChooser();
                 file_chooser.setTitle( "Select image" );
                 FileChooser.ExtensionFilter extension = new FileChooser.ExtensionFilter( "Image files", "*.jpg", "*.jpeg", "*.png" );
@@ -362,8 +283,22 @@ public class PdfWriter extends Application
                     }
                     refresh_image();
                 }
+                else
+                {
+                    Message_box.show( "Please select image file", "Warning", Message_box.warning_message );
+                }
             }
         };
+    }
+
+    private boolean check_selected_pages()
+    {
+        boolean res = false;
+        for ( int i = 0; i < listview_pages.getItems().size(); i++ )
+        {
+            res = res || listview_pages.getItems().get( i ).isSelected();
+        }
+        return res;
     }
 
     private EventHandler<ActionEvent> get_btn_draw_text_action()
@@ -373,6 +308,12 @@ public class PdfWriter extends Application
             @Override
             public void handle( ActionEvent event )
             {
+                if ( !check_selected_pages() )
+                {
+                    Message_box.show( "Select at least 1 page on the left", "Warning", Message_box.warning_message );
+                    listview_pages.requestFocus();
+                    return;
+                }
                 if ( !txtfield_textimage.getText().trim().equals( "" ) )
                 {
                     int pos_x = Integer.parseInt( txtfield_image_x.getText().trim() );
@@ -405,6 +346,11 @@ public class PdfWriter extends Application
                     }
                     refresh_image();
                 }
+                else
+                {
+                    Message_box.show( "Please enter text", "Warning", Message_box.warning_message );
+                    txtfield_textimage.requestFocus();
+                }
             }
         };
     }
@@ -416,6 +362,12 @@ public class PdfWriter extends Application
             @Override
             public void handle( ActionEvent event )
             {
+                if ( !check_selected_pages() )
+                {
+                    Message_box.show( "Select at least 1 page on the left", "Warning", Message_box.warning_message );
+                    listview_pages.requestFocus();
+                    return;
+                }
                 int pos_x = Integer.parseInt( txtfield_image_x.getText().trim() );
                 int pos_y = Integer.parseInt( txtfield_image_y.getText().trim() );
                 int img_width = Integer.parseInt( txtfield_image_width.getText().trim() );
@@ -470,5 +422,25 @@ public class PdfWriter extends Application
         imgview_pdf.setImage( SwingFXUtils.toFXImage( buffered, null ) );
         imgview_pdf.setFitWidth( buffered.getWidth() );
         imgview_pdf.setFitHeight( buffered.getHeight() );
+    }
+
+    private EventHandler<ActionEvent> get_btn_save_pdf_action()
+    {
+        return new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle( ActionEvent event )
+            {
+                try
+                {
+                    doc.save( desktop_path + "out.pdf" );
+                    Message_box.show( "PDF file is exported to your desktop", "Success", Message_box.info_message );
+                }
+                catch ( IOException ex )
+                {
+                    Message_box.show( "ex " + ex.getLocalizedMessage() );
+                }
+            }
+        };
     }
 }

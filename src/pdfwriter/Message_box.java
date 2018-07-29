@@ -7,6 +7,7 @@ import javafx.geometry.VPos;
 import javafx.scene.SceneBuilder;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBuilder;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Font;
@@ -41,6 +42,14 @@ public class Message_box
         } ).build();
         new_group = VBoxBuilder.create().layoutY( 10 ).alignment( Pos.TOP_CENTER ).spacing( 30 ).children( new_text, new_button ).prefWidth( 300 ).prefHeight( 200 ).build();
         new_stage.setScene( SceneBuilder.create().root( new_group ).build() );
+        if ( message_type == warning_message )
+        {
+            new_stage.getIcons().add( new Image( PdfWriter.class.getResourceAsStream( "imgs/warning.png" ) ) );
+        }
+        else if ( message_type == info_message )
+        {
+            new_stage.getIcons().add( new Image( PdfWriter.class.getResourceAsStream( "imgs/info.png" ) ) );
+        }
         new_stage.setWidth( new_text.getWrappingWidth() + 40 );
         new_stage.setHeight( 170 );
         new_stage.show();
