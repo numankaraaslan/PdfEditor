@@ -2,7 +2,7 @@
 
 This is an example project to show how to use apache pdfbox library with JavaFX.
 
-It is probably full of bugs and unoptimized code but there is examples of adding an image on a page, drawing a text on a page and zooming in and out of the pdf file in a scrollview.
+It is probably full of bugs and unoptimized code but there are examples of adding an image on a page, drawing a text on a page and zooming in and out of the pdf file in a scrollview.
 
 If requested, i mght try to add new functionalities too.
 
