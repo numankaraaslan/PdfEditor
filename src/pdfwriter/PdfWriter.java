@@ -47,7 +47,7 @@ public class PdfWriter extends Application
     private PDPageContentStream content_stream;
     private final VBox root = new VBox( 10 ), vbox_list = new VBox( 10 );
     private final HBox hbox_controls = new HBox( 10 ), hbox_controls_image = new HBox( 10 ), hbox_controls_text_rectangle = new HBox( 10 ), hbox_pdf = new HBox( 10 );
-    private Button btn_load_pdf, btn_save_pdf, btn_draw_img, btn_draw_text, btn_draw_rect;
+    private Button btn_load_pdf, btn_save_pdf, btn_rotate_right, btn_rotate_left, btn_draw_img, btn_draw_text, btn_draw_rect;
     private Text txt_image_x, txt_image_height, txt_image_y, txt_image_width, txt_shape_thick, txt_textimage;
     private TextField txtfield_image_x, txtfield_image_height, txtfield_image_y, txtfield_image_width, txtfield_shape_thick, txtfield_textimage;
     private int page_index = 1;
@@ -81,6 +81,8 @@ public class PdfWriter extends Application
         txtfield_textimage = Builders.build_textField( "", 150 );
         btn_load_pdf = Builders.build_button( "Load pdf", true );
         btn_save_pdf = Builders.build_button( "Save pdf", false );
+        btn_rotate_right = Builders.build_button( "Rotate Right", false );
+        btn_rotate_left = Builders.build_button( "Rotate Left", false );
         btn_draw_img = Builders.build_button( "Draw image", false );
         btn_draw_text = Builders.build_button( "Draw text", false );
         btn_draw_rect = Builders.build_button( "Draw rectangle", false );
@@ -89,6 +91,8 @@ public class PdfWriter extends Application
         btn_draw_img.setOnAction( get_btn_draw_image_action() );
         btn_draw_text.setOnAction( get_btn_draw_text_action() );
         btn_save_pdf.setOnAction( get_btn_save_pdf_action() );
+        btn_rotate_right.setOnAction( get_btn_rotate_right_action() );
+        btn_rotate_left.setOnAction( get_btn_rotate_left_action() );
         imgview_pdf = new ImageView();
         imgview_pdf.setPreserveRatio( true );
         slider_page = new Slider( 0, 1, 0 );
@@ -149,7 +153,7 @@ public class PdfWriter extends Application
         listview_pages = new ListView<>();
         listview_pages.setPrefWidth( 200 );
         listview_pages.prefHeightProperty().bind( scroll_pdf.prefHeightProperty() );
-        hbox_controls.getChildren().addAll( btn_load_pdf, slider_page, combobox_zoom, btn_save_pdf );
+        hbox_controls.getChildren().addAll( btn_load_pdf, slider_page, combobox_zoom, btn_rotate_left, btn_rotate_right, btn_save_pdf );
         hbox_controls.setAlignment( Pos.CENTER_LEFT );
         hbox_controls_image.getChildren().addAll( txt_image_x, txtfield_image_x, txt_image_y, txtfield_image_y, txt_image_width, txtfield_image_width, txt_image_height, txtfield_image_height, btn_draw_img );
         hbox_controls_image.setAlignment( Pos.CENTER_LEFT );
@@ -201,15 +205,17 @@ public class PdfWriter extends Application
                         Message_box.show( "ex " + ex.getLocalizedMessage() );
                     }
                     doc_pages = doc.getPages();
+                    renderer = new PDFRenderer( doc );
                     slider_page.setMin( 1 );
                     slider_page.setMax( doc_pages.getCount() );
                     slider_page.setValue( 1 );
                     slider_page.setDisable( false );
                     btn_save_pdf.setDisable( false );
+                    btn_rotate_left.setDisable( false );
+                    btn_rotate_right.setDisable( false );
                     btn_draw_img.setDisable( false );
                     btn_draw_text.setDisable( false );
                     btn_draw_rect.setDisable( false );
-                    renderer = new PDFRenderer( doc );
                     listview_pages.getItems().clear();
                     page_index = 1;
                     int pdf_width = ( int ) doc_pages.get( 0 ).getMediaBox().getWidth();
@@ -274,11 +280,21 @@ public class PdfWriter extends Application
                             {
                                 content_stream = new PDPageContentStream( doc, doc_pages.get( i ), PDPageContentStream.AppendMode.APPEND, true );
                                 content_stream.drawImage( x_object, pos_x, pos_y, img_width, img_height );
-                                content_stream.close();
                             }
                             catch ( IOException ex )
                             {
                                 Message_box.show( "ex " + ex.getLocalizedMessage() );
+                            }
+                            finally
+                            {
+                                try
+                                {
+                                    content_stream.close();
+                                }
+                                catch ( IOException ex )
+                                {
+                                    // my ass
+                                }
                             }
                         }
                     }
@@ -337,11 +353,21 @@ public class PdfWriter extends Application
                                 content_stream.newLineAtOffset( pos_x, pos_y );
                                 content_stream.showText( txtfield_textimage.getText().trim() );
                                 content_stream.endText();
-                                content_stream.close();
                             }
                             catch ( IOException ex )
                             {
                                 Message_box.show( "ex " + ex.getLocalizedMessage() );
+                            }
+                            finally
+                            {
+                                try
+                                {
+                                    content_stream.close();
+                                }
+                                catch ( IOException ex )
+                                {
+                                    // my ass
+                                }
                             }
                         }
                     }
@@ -397,11 +423,21 @@ public class PdfWriter extends Application
                                 content_stream.stroke();
                             }
                             content_stream.stroke();
-                            content_stream.close();
                         }
                         catch ( IOException ex )
                         {
                             Message_box.show( "ex " + ex.getLocalizedMessage() );
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                content_stream.close();
+                            }
+                            catch ( IOException ex )
+                            {
+                                // my ass
+                            }
                         }
                     }
                 }
@@ -420,9 +456,12 @@ public class PdfWriter extends Application
         {
             Message_box.show( "ex " + ex.getLocalizedMessage() );
         }
-        imgview_pdf.setImage( SwingFXUtils.toFXImage( buffered, null ) );
-        imgview_pdf.setFitWidth( buffered.getWidth() );
-        imgview_pdf.setFitHeight( buffered.getHeight() );
+        if ( buffered != null )
+        {
+            imgview_pdf.setImage( SwingFXUtils.toFXImage( buffered, null ) );
+            imgview_pdf.setFitWidth( buffered.getWidth() );
+            imgview_pdf.setFitHeight( buffered.getHeight() );
+        }
     }
 
     private EventHandler<ActionEvent> get_btn_save_pdf_action()
@@ -441,6 +480,34 @@ public class PdfWriter extends Application
                 {
                     Message_box.show( "ex " + ex.getLocalizedMessage() );
                 }
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> get_btn_rotate_left_action()
+    {
+
+        return new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle( ActionEvent event )
+            {
+                doc_pages.get( page_index - 1 ).setRotation( doc_pages.get( page_index - 1 ).getRotation() - 90 );
+                refresh_image();
+            }
+        };
+    }
+
+    private EventHandler<ActionEvent> get_btn_rotate_right_action()
+    {
+
+        return new EventHandler<ActionEvent>()
+        {
+            @Override
+            public void handle( ActionEvent event )
+            {
+                doc_pages.get( page_index - 1 ).setRotation( doc_pages.get( page_index - 1 ).getRotation() + 90 );
+                refresh_image();
             }
         };
     }
