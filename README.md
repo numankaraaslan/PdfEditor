@@ -6,6 +6,4 @@ It is probably full of bugs and unoptimized code but there are examples of addin
 
 If requested, i mght try to add new functionalities too.
 
-The project is a Netbeans JavaFX project with Java 1.8.
-
-If you try to open with another ide, u must download pdfbox-2.0.11 and fontbox-2.0.11 and apache commons logging libraries and include them as libraries in your project.
+The project is a Maven project. You can easily run it with your IDE that can open maven projects.
